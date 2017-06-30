@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0/angular-resource.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular-route.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+		<link rel="stylesheet" href="stylesheets/style.css">
+<!--<body ng-app="myApp">
+
+<p><a href="#/!">Main</a></p>
+<a href="#!login">Login</a>
+<a href="#!register">Register</a>
+-->
+<head>
+<style>
+h1 {
+	background-image: url("background.jpg");
+  background-color: #cccccc;
+}
+</style>
+</head>
+
+<body ng-app="myApp">
+		<div id='main' class="container">
+			<nav class="navbar-fluid navbar-default navbar-fixed-top">
+				<div class="container">
+					<p class="navbar-left navbar-text"><a href="#/!"> Home </a></p>
+					<p class="navbar-text"> XYZ Classes</p>
+					<p class="navbar-right navbar-text"><a href="#!login">Sign in</a> or <a href="#!register">Sign up</a></p>
+				</div>
+			</nav>
+			<img src="booksimage.jpg" alt="Mountain View" style="width:1200px;height:228px;">
+			<!--<h1>Hello</h1>-->
+			<div class="col-md-offset-2 col-md-8">
+				<div ng-view>
+				</div>
+			</div>
+		</div>
+
+
+<!--<div ng-view></div>-->
+
+<script>
+var app = angular.module("myApp", ["ngRoute"]).run(function($rootScope){
+	$rootScope.authenticated = false;
+	$rootScope.current_user = "";
+});
+app.config(function($routeProvider) {
+    $routeProvider
+    /*.when("/", {
+        templateUrl : "index.html",
+    })*/
+		.when("/reset", {
+        templateUrl : "reset_password.htm",
+        controller : "authController"
+
+    })
+
+		.when("/login", {
+        templateUrl : "login.htm",
+        controller : "authController"
+
+    })
+
+		.when("/register", {
+        templateUrl : "register.htm",
+        controller : "authController"
+    });
+});
+app.controller('authController', function($scope, $http, $rootScope, $location){
+  $scope.user = {username: '', password: ''};
+  $scope.error_message = '';
+
+$scope.login = function()
+{
+	/*
+	$http.post('/auth/login', $scope.user).success(function(data){
+
+		   console.log("Before If..........");
+       if(data.state == 'success'){
+				 console.log("Debug 1:Login If..........");
+         $rootScope.authenticated = true;
+         $rootScope.current_user = data.user.username;
+         $location.path('/reset');
+       }
+       else{
+				 console.log("Debug 2:Login else..........");
+         $scope.error_message = data.message;
+       }
+			 console.log("After If..........");
+     });*/
+		 $http.post('/auth/login', $scope.user).then(function successCallback(response){
+
+		 		 console.log("Before If..........");
+				 console.log(response.data.state);
+				 console.log(response.data.user.username);
+
+		 		 if(response.data.state == 'success'){
+		 			 console.log("Debug 1:Login If..........");
+		 			 $rootScope.authenticated = true;
+		 			 $rootScope.current_user = response.data.user.username;
+					 $scope.error_message = response.message;
+		 			 $location.path('/reset');
+		 		 }
+		 		 else{
+		 			 console.log("Debug 2:Login else..........");
+		 			 $scope.error_message = response.message;
+		 		 }
+		 		 console.log("After If..........");
+		 	 });
+
+
+};
+
+$scope.register = function()
+{
+	$http.post('/auth/signup', $scope.user).then(function successCallback(response){
+
+		  console.log("Before If..........");
+     if(response.data.state == 'success'){
+				console.log("Debug 1:Signup If");
+        $rootScope.authenticated = true;
+        $rootScope.current_user = response.data.user.username;
+				$scope.error_message = response.message;
+        $location.path('/reset');
+      }
+      else{
+				console.log("Debug 2:Signup else..........");
+        $scope.error_message = data.message;
+      }
+    });
+};
+
+});
+
+</script>
+
+</body>
+</html>
