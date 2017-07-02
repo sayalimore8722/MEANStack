@@ -26,7 +26,9 @@ h1 {
 				<div class="container">
 					<p class="navbar-left navbar-text"><a href="#/!"> Home </a></p>
 					<p class="navbar-text"> XYZ Classes</p>
-					<p class="navbar-right navbar-text"><a href="#!login">Sign in</a> or <a href="#!register">Sign up</a></p>
+					<p class="navbar-right navbar-text" ng-hide='authenticated'><a href="#!login">Sign in</a> or <a href="#!register">Sign up</a></p>
+					<p class='navbar-right navbar-text' ng-show='authenticated'><a href='#' ng-click='signout()'>Logout</a></p>
+					<p class='navbar-right navbar-text' ng-show='authenticated'>Hi,{{current_user}}</p>
 				</div>
 			</nav>
 			<img src="booksimage.jpg" alt="Mountain View" style="width:1200px;height:228px;">
@@ -41,14 +43,23 @@ h1 {
 <!--<div ng-view></div>-->
 
 <script>
-var app = angular.module("myApp", ["ngRoute"]).run(function($rootScope){
+var app = angular.module("myApp", ["ngRoute"]).run(function($rootScope,$http){
 	$rootScope.authenticated = false;
 	$rootScope.current_user = "";
+
+	$rootScope.signout = function()
+	{
+		$http.get('auth/signout');
+		$rootScope.authenticated = false;
+		$rootScope.current_user = "";
+	};
+
 });
 app.config(function($routeProvider) {
     $routeProvider
-    /*.when("/", {
-        templateUrl : "index.html",
+    /*.when("/#!/", {
+        templateUrl : "reset_password.html",
+				controller : "authController"
     })*/
 		.when("/reset", {
         templateUrl : "reset_password.htm",
@@ -69,6 +80,7 @@ app.config(function($routeProvider) {
 });
 app.controller('authController', function($scope, $http, $rootScope, $location){
   $scope.user = {username: '', password: ''};
+
   $scope.error_message = '';
 
 $scope.login = function()
@@ -114,6 +126,13 @@ $scope.login = function()
 
 $scope.register = function()
 {
+	/*if($scope.password == $scope.password1)
+	{
+		console.log('Passwords are same');
+	}
+	else {
+		console.log('Password different');
+	}*/
 	$http.post('/auth/signup', $scope.user).then(function successCallback(response){
 
 		  console.log("Before If..........");
