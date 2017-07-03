@@ -31,7 +31,7 @@ h1 {
 					<p class='navbar-right navbar-text' ng-show='authenticated'>Hi,{{current_user}}</p>
 				</div>
 			</nav>
-			<img src="booksimage.jpg" alt="Mountain View" style="width:1200px;height:228px;">
+			<img src="booksimage.jpg" alt="Mountain View" ng-hide='authenticated' style="width:1200px;height:228px;">
 			<!--<h1>Hello</h1>-->
 			<div class="col-md-offset-2 col-md-8">
 				<div ng-view>
