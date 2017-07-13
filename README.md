@@ -1,5 +1,6 @@
 # MEANStack
 This repository contains MEANStack projects
+
 Lab 1 : Calculator
 This lab assignment covers developing REST services using Node.js (Express JS), HTML5 and Angular JS
 
