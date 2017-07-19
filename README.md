@@ -23,4 +23,17 @@ Testing :
 8. Invoke 100 concurrent users with 1000 calls on randomly selected tasks 
 9. Stop the timer and print out the average time for each operation returned by JMeter 
  
+ Ebay Marketplace Application
+ 
+ You need to develop “Simple Market Place”. This server should perform the following tasks: 
+ 
+a) Basic functionality would include user to Sign Up, Sign In, Sign Out. Sign Up should have first name, last name, Email and password. In order to use the system, a user must sign in first. 
+b) Should be able to store user’s advertisements for others to read. This should at-least include the item name, item description, seller information, item price and quantity. (Only text, no images). E.g. Advertisement – “Laptop”, “2.2 GHz Core 2 Duo, 2GB RAM…”, “Jon Smith, shipping from NY”, “$600”, “4 pieces”
+c) Should give all the advertisements details to all the other users.
+d) Users can buy the product displayed by other users. You should take care of quantities and should respectively reflect user accounts in case of any transaction. 
+e) Shopping Cart should be maintained which will reflect temporary items. Users should be able to add, remove items from the cart until checkout.
+f) Checkout should deduct and add items from seller and buyer respectively.
+g) Should perform simple credit card validations on payment. (check to be sure the number entered is16 digits) 
+h) Users account should reflect all the bought and sold items. 
+i) Should maintain time last logged in and should be returned back when user logs in. 
  
