@@ -36,4 +36,15 @@ f) Checkout should deduct and add items from seller and buyer respectively.
 g) Should perform simple credit card validations on payment. (check to be sure the number entered is16 digits) 
 h) Users account should reflect all the bought and sold items. 
 i) Should maintain time last logged in and should be returned back when user logs in. 
+
+Testing :
+Testing of the server should be done using JMeter and Mocha. Mocha is a node.js testing framework.  
+ 
+Following tasks to be tested using JMeter: (2 Points) 
+ 
+Test the server for 100, 200, 300, 400 and 500 concurrent users with and without connection pooling. Draw the graph with the average time and include it in the report. 
+ 
+Following tasks to be tested using Mocha: (1 Point) 
+ 
+Implement 5 randomly selected REST web service API calls using Mocha. Display the output in the report
  
