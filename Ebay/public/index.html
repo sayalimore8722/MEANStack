@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0/angular-resource.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular-route.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+<link rel="stylesheet" href="stylesheets/style.css">
+
+
+
+<body ng-app="myApp">
+		<div id='main' class="container">
+			<nav class="navbar-fluid navbar-default navbar-fixed-top">
+				<div class="container">
+					<p class="navbar-left navbar-text"><a href="#/!"> Home </a></p>
+
+					<img src="ebay.jpg" alt="ebay_logo" style="width:80px;height=10px;">
+
+					<p class="navbar-right navbar-text" ng-hide='authenticated'><a href="#!login">Login</a> or <a href="#!register">Sign up</a></p>
+					<p class='navbar-right navbar-text' ng-show='authenticated'><a href='#' ng-click='signout()'>Logout</a></p>
+					<p class='navbar-right navbar-text' ng-show='authenticated'>Hi,{{current_user}}</p>
+				</div>
+			</nav>
+			<div class="col-md-offset-2 col-md-8">
+				<div ng-view>
+				</div>
+			</div>
+		</div>
+
+
+<!--<div ng-view></div>-->
+
+<script>
+var app = angular.module("myApp", ["ngRoute","ngResource"]).run(function($rootScope,$http){
+	$rootScope.authenticated = false;
+	$rootScope.current_user = "";
+	$rootScope.array = {username : '', type : '', description : '', seller_details : '', quantity : '', price : ''};
+	$rootScope.cart_items = {username : '', type : '', description : '', seller_details : '', quantity : '', price : ''};
+
+	$rootScope.signout = function()
+	{
+		$http.get('auth/signout');
+		$rootScope.authenticated = false;
+		$rootScope.current_user = "";
+
+	};
+
+});
+
+
+app.factory('product_Service', function($resource){
+  return $resource('/api/product/:id');
+});
+
+app.factory('ebayService', function($resource){
+  return $resource('/api/about/:username_id');
+});
+
+app.factory('ebay_advService', function($resource){
+  return $resource('/api/advertise');
+});
+
+app.factory('cart_Service', function($resource){
+	return $resource('/api/cart');
+});
+
+app.factory('cartService', function($resource){
+  return $resource('/api/carts/:username');
+});
+
+
+app.config(function($routeProvider) {
+    $routeProvider
+    /*.when("/#!/", {
+        templateUrl : "reset_password.html",
+				controller : "authController"
+    })*/
+		.when("/reset", {
+        templateUrl : "reset_password.htm",
+        controller : "authController"
+
+    })
+
+		.when("/login", {
+        templateUrl : "login.htm",
+        controller : "authController"
+
+    })
+
+		.when("/profile",{
+			templateUrl : "profile.htm",
+			controller : "authController"
+		})
+
+		.when("/ebay_page",{
+			templateUrl : "ebay_page.htm",
+			controller : "authController"
+		})
+
+		.when("/cart",{
+			templateUrl : "cart.htm",
+			controller : "authController"
+		})
+
+		.when("/buy",{
+			templateUrl : "buy.htm",
+			controller : "authController"
+		})
+
+		.when("/register", {
+        templateUrl : "register.htm",
+        controller : "authController"
+
+    });
+});
+
+
+
+app.controller('authController', function($scope, $http, $rootScope, $location, ebayService, ebay_advService, cart_Service, cartService, product_Service, $routeParams){
+  $scope.user = {username: '', password: ''};
+	$scope.user_details = {name: '', email:''};
+	$scope.details = {username: '',birthdate: '', contact: '', address: '', city: '', pin: ''};
+	$scope.advertisearray = {username : '', type : '', description : '', seller_details : '', quantity : '', price : ''};
+	$scope.cartarray = {username : '', type : '', description : '', seller_details : '', quantity : '', price : ''};
+	$scope.username_id = '';
+  $scope.error_message = '';
+	$scope.message = '';
+	$scope.firstname = '';
+	$scope.quantity = '';
+
+
+
+
+$scope.login = function()
+{
+
+
+		 $http.post('/auth/login', $scope.user).then(function successCallback(response){
+
+		 		 console.log("Before If..........");
+				 console.log(response.data.state);
+				 console.log(response.data.user.username);
+
+		 		 if(response.data.state == 'success'){
+		 			 console.log("Debug 1:Login If..........");
+		 			 $rootScope.authenticated = true;
+		 			 $rootScope.current_user = response.data.user.username;
+					 $scope.error_message = response.message;
+					 if($rootScope.authenticated == true)
+					 {
+						 console.log('I am authenticate');
+					 }
+
+		 			 $location.path('/ebay_page');
+
+		 		 }
+		 		 else{
+		 			 console.log("Debug 2:Login else..........");
+		 			 $scope.error_message = response.message;
+		 		 }
+		 		 console.log("After If..........");
+		 	 });
+};
+
+$scope.register = function()
+{
+	$http.post('/auth/signup', $scope.user).then(function successCallback(response){
+
+		  console.log("Before If..........");
+     if(response.data.state == 'success'){
+				console.log("Debug 1:Signup If");
+        $rootScope.authenticated = true;
+        $rootScope.current_user = response.data.user.username;
+				$scope.error_message = response.message;
+
+        $location.path('/profile');
+      }
+      else{
+				console.log("Debug 2:Signup else..........");
+      }
+    });
+};
+
+$scope.save = function()
+{
+	console.log("In save....");
+
+	$scope.details.username = $rootScope.current_user;
+
+	$http.post('/api/about',$scope.details).then(function successCallback(response){
+		console.log('After get');
+	});
+	$scope.message = 'Helllllooooo';
+	$location.path('/ebay_page');
+
+};
+
+$scope.load_Profile = function()
+{
+	$scope.username_id = $rootScope.current_user;
+	console.log('******');
+	console.log($rootScope.current_user);
+	console.log($scope.username_id);
+
+
+	var entry = ebayService.get({ username_id: $scope.username_id }, function() {
+    console.log(entry.username);
+		console.log(entry.birthdate);
+		console.log(entry.address);
+		console.log(entry.city);
+		console.log(entry.pin);
+
+		$scope.details.username = entry.username;
+		$scope.details.birthdate = entry.birthdate;
+		$scope.details.address = entry.address;
+		$scope.details.city = entry.city;
+		$scope.details.pin = entry.pin;
+
+		console.log($scope.details.username);
+		console.log($scope.details.birthdate);
+		console.log($scope.details.address);
+		console.log($scope.details.city);
+		console.log($scope.details.pin);
+  });
+};
+
+$scope.advertise = function()
+{
+	$scope.advertisearray.username = $rootScope.current_user;
+	console.log('in advertise');
+	$scope.entry = new ebay_advService();
+	$scope.entry.data = $scope.advertisearray;
+
+ 	ebay_advService.save($scope.advertisearray, function() {
+ 	});
+};
+
+
+$scope.buy_Product = function(href)
+{
+	console.log('Before buy path');
+	//alert(href);
+	var product_id = href.split('?')[1];
+	console.log(product_id);
+
+
+
+  $scope.product = product_Service.get({id : product_id}, function() {
+
+		console.log($scope.product);
+		console.log($scope.product.username);
+		console.log($scope.product.type);
+		console.log($scope.product.description);
+		console.log($scope.product.price);
+		console.log($scope.product.quantity);
+
+		$scope.array.username = $scope.product.username;
+		$scope.array.type = $scope.product.type;
+		$scope.array.seller_details = $scope.product.seller_details;
+		$scope.array.description = $scope.product.description;
+		$scope.array.quantity = $scope.product.quantity;
+		$scope.array.price = $scope.product.price;
+
+		console.log($scope.array.username);
+		console.log($scope.array.type);
+		console.log($scope.array.seller_details);
+		console.log($scope.array.description);
+		console.log($scope.array.quantity);
+		console.log($scope.array.price);
+
+
+	});
+
+
+};
+
+$scope.get_Advertises = function()
+{
+	console.log('Loading advertises');
+
+	$scope.advertises = ebay_advService.query(function()
+	{
+		console.log("///////////");
+		console.log($scope.advertises);
+	});
+};
+
+
+$scope.add_Tocart = function()
+{
+	console.log(';;;;;;;;;;;');
+	console.log($rootScope.array);
+	console.log($scope.quantity);
+	$scope.cartarray.username = $rootScope.array.username;
+	$scope.cartarray.type = $rootScope.array.type;
+	$scope.cartarray.seller_details = $rootScope.array.seller_details;
+	$scope.cartarray.description = $rootScope.array.description;
+	$scope.cartarray.quantity = $scope.quantity;
+	$scope.cartarray.price = $rootScope.array.price;
+
+	console.log($scope.cartarray);
+	console.log('In cart');
+  cart_Service.save($scope.cartarray, function(){
+
+});
+};
+
+$scope.show_Cart = function()
+{
+	$scope.username_id = $rootScope.current_user;
+	console.log('******');
+	console.log($rootScope.current_user);
+	console.log($scope.username_id);
+  var url = '/api/carts/' + $rootScope.current_user;
+	console.log(url);
+	$http.get(url).then(function successCallback(response){
+	console.log('After cart');
+	console.log(response);
+	$rootScope.cart_items = response.data;
+	console.log($rootScope.cart_items);
+	console.log($rootScope.cart_items.length);
+	for(var i=0;i<($rootScope.cart_items.length);i++)
+	{
+			console.log($rootScope.cart_items[i].description);
+	}
+	console.log($rootScope.cart_items[0].description);
+	});
+
+
+
+
+
+
+};
+});
+
+</script>
+
+</body>
+</html>
