@@ -1,0 +1,104 @@
+<html>
+<head>
+  <style>
+  * {
+    margin: 0;
+    padding: 0;
+  }
+
+  .card{
+    position: relative;
+    top: 0;
+    left: -60%;
+    width:300px;
+  }
+
+  .adv{
+    position: relative;
+    top: -120%;
+
+  }
+
+  .create_adv{
+    position:relative;
+    left: 100%;
+    top: -935%;
+  }
+
+  table, tr, td {
+      border: 1px solid black;
+  }
+</style>
+</head>
+<div ng-app="myApp" ng-controller="authController" data-ng-init="load_Profile();get_Advertises()">
+<br>
+<br>
+<div id="trial">
+<form ng-submit="val1=true;advertise()" style = "height:385px">
+
+<br/>
+<br/>
+<div class = "card">
+<h1><u><b>Profile Details</b></u></h1>
+<table width = "300px;" height = "200px">
+<tr>
+<td>
+<p>Username : {{details.username}}</p><br>
+<p>Birthdate : {{details.birthdate}}</p><br>
+<p>Address : {{details.address}}</p><br>
+<p>City : {{details.city}}</p><br>
+<p>Pin : {{details.pin}}</p><br>
+</td>
+</tr>
+</table>
+</div>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<div class = "adv">
+  <h1><u><b>All Products</b></u></h1>
+<table width = "600px;" height = "385px">
+<tr>
+<td>
+<div class = "advertise" ng-repeat = "advert in advertises">
+
+<a href = "#!buy/?{{advert._id}}" ng-click = "buy_Product($event.target.href);">Type : {{advert.type}} ({{advert._id}})</a><br><br>
+<p>Username : {{advert.username}}</p><br>
+<p>Description : {{advert.description}}</p><br>
+<p>seller_details : {{advert.seller_details}}</p><br>
+<p>Quantity : {{advert.quantity}}</p><br>
+<p>Price : {{advert.price}}</p><br>
+<p>-----------------------------------------------------------------------------------------------------------------------------</p>
+
+</div>
+</td>
+</tr>
+</table>
+</div>
+
+<div class = "create_adv">
+<table width = "450px;" height = "400px;">
+<tr>
+<td>
+  <p style="padding-left:3cm"><b>Publish new Advertise<b><p>
+<br><br>
+<input type = "text"  ng-model = "advertisearray.type" placeholder = "Type" class = "form-control"></text><br>
+<input type = "text"  ng-model = "advertisearray.description" placeholder = "Seller details" class = "form-control"></text><br>
+<input type = "text"  ng-model = "advertisearray.seller_details" placeholder = "Description" class = "form-control"></text><br>
+<input type = "text"  ng-model = "advertisearray.quantity" placeholder = "Quantity" class = "form-control"></text><br>
+<input type = "text"  ng-model = "advertisearray.price" placeholder = "Price" class = "form-control"></text><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<input type = "submit" value = "Advertise" class = "btn btn-primary">
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</form>
+</body>
+</html>
