@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0/angular-resource.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular-route.js"></script>
+<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false&v=3&libraries=geometry"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+		<link rel="stylesheet" href="stylesheets/style.css">
+
+<head>
+<style>
+h1 {
+	background-image: url("background.jpg");
+  background-color: #cccccc;
+}
+</style>
+</head>
+
+<body ng-app="myApp">
+		<div id='main' class="container">
+			<nav class="navbar-fluid navbar-default navbar-fixed-top">
+				<div class="container">
+					<p class="navbar-left navbar-text"><a href="#/!"> Home </a></p>
+					<p class="navbar-text"> Merchandise Shopping App </p>
+					<p class="navbar-right navbar-text" ng-hide='authenticated'><a href="#!login">Sign in</a> or <a href="#!register">Sign up</a></p>
+					<p class='navbar-right navbar-text' ng-show='authenticated'><a href='#' ng-click='signout()'>Logout</a></p>
+					<p class='navbar-right navbar-text' ng-show='authenticated'>Hi,{{current_user}}</p>
+				</div>
+			</nav>
+
+
+			<div class="col-md-offset-2 col-md-8">
+				<div ng-view>
+				</div>
+			</div>
+		</div>
+
+
+
+
+<script>
+var app = angular.module("myApp", ["ngRoute"]).run(function($rootScope,$http){
+	$rootScope.authenticated = false;
+	$rootScope.current_user = "";
+
+	$rootScope.signout = function()
+	{
+		$http.get('auth/signout');
+		$rootScope.authenticated = false;
+		$rootScope.current_user = "";
+	};
+
+});
+app.config(function($routeProvider) {
+    $routeProvider
+    /*.when("/#!/", {
+        templateUrl : "reset_password.html",
+				controller : "authController"
+    })*/
+		.when("/reset", {
+        templateUrl : "reset_password.htm",
+        controller : "authController"
+
+    })
+
+		.when("/login", {
+        templateUrl : "login.htm",
+        controller : "authController"
+
+    })
+
+		.when("/exam",{
+			templateUrl : "exam_page.html",
+			controller : "authController"
+		})
+
+		.when("/register", {
+        templateUrl : "register.htm",
+        controller : "authController"
+    });
+});
+app.controller('authController', function($scope, $http, $rootScope, $location){
+  $scope.user = {username: '', password: ''};
+
+  $scope.error_message = '';
+
+$scope.login = function()
+{
+	/*
+	$http.post('/auth/login', $scope.user).success(function(data){
+
+		   console.log("Before If..........");
+       if(data.state == 'success'){
+				 console.log("Debug 1:Login If..........");
+         $rootScope.authenticated = true;
+         $rootScope.current_user = data.user.username;
+         $location.path('/reset');
+       }
+       else{
+				 console.log("Debug 2:Login else..........");
+         $scope.error_message = data.message;
+       }
+			 console.log("After If..........");
+     });*/
+		 $http.post('/auth/login', $scope.user).then(function successCallback(response){
+
+		 		 console.log("Before If..........");
+				 console.log(response.data.state);
+				 console.log(response.data.user.username);
+
+		 		 if(response.data.state == 'success'){
+		 			 console.log("Debug 1:Login If..........");
+		 			 $rootScope.authenticated = true;
+		 			 $rootScope.current_user = response.data.user.username;
+					 $scope.error_message = response.message;
+		 			 $location.path('/exam');
+		 		 }
+		 		 else{
+		 			 console.log("Debug 2:Login else..........");
+		 			 $scope.error_message = response.message;
+		 		 }
+		 		 console.log("After If..........");
+		 	 });
+
+
+};
+
+$scope.getLocation = function()
+{
+console.log('In Location');
+/*var latitude1 = 37.33;
+var longitude1 = -121.89;
+var latitude2 = 37.77;
+var longitude2 =  -122.43;
+
+var distance = google.maps.geometry.spherical.computeDistanceBetween(new google.maps.LatLng(latitude1, longitude1), new google.maps.LatLng(latitude2, longitude2));
+console.log('*******');
+console.log((distance*0.001));*/
+
+/*
+if (navigator.geolocation) {
+				console.log('In if');
+        navigator.geolocation.getCurrentPosition($scope.showPosition(position));
+
+    } else {
+        console.log("Geolocation is not supported by this browser.");
+    }*/
+		if (navigator.geolocation) {
+			console.log('In if');
+	 navigator.geolocation.getCurrentPosition(function(position){
+		 console.log('In if1');
+		 $scope.$apply(function(){
+			 console.log('In if2');
+			 $scope.position = position;
+			 console.log($scope.position.coords.latitude);
+			 console.log($scope.position.coords.longitude);
+		 });
+	 });
+ }
+
+
+  //var pyrmont = new google.maps.LatLng($rootScope.position.coords.latitude, $rootScope.position.coords.longitude);
+	console.log($scope.position.coords.latitude);
+	console.log($scope.position.coords.longitude);
+  var map = new google.maps.Map(document.getElementById('map'), {
+    center: pyrmont,
+    zoom: 15,
+    scrollwheel: false
+  });
+
+  // Specify location, radius and place types for your Places API search.
+  var request = {
+    location: pyrmont,
+    radius: '500',
+    types: ['store']
+  };
+
+  // Create the PlaceService and send the request.
+  // Handle the callback with an anonymous function.
+  var service = new google.maps.places.PlacesService(map);
+  service.nearbySearch(request, function(results, status) {
+		console.log('Place');
+    if (status == google.maps.places.PlacesServiceStatus.OK) {
+			console.log('Place1');
+      for (var i = 0; i < results.length; i++) {
+        var place = results[i];
+				console.log(place);
+        // If the request succeeds, draw the place location on
+        // the map as a marker, and register an event to handle a
+        // click on the marker.
+        var marker = new google.maps.Marker({
+          map: map,
+          position: place.geometry.location
+        });
+      }
+    }
+  });
+
+};
+
+$scope.showPosition = function(position)
+{
+	console.log('In position');
+	console.log(position.coords.latitude);
+	console.log(position.coords.longitude);
+}
+
+
+$scope.register = function()
+{
+	/*if($scope.password == $scope.password1)
+	{
+		console.log('Passwords are same');
+	}
+	else {
+		console.log('Password different');
+	}*/
+	$http.post('/auth/signup', $scope.user).then(function successCallback(response){
+
+		  console.log("Before If..........");
+     if(response.data.state == 'success'){
+				console.log("Debug 1:Signup If");
+        $rootScope.authenticated = true;
+        $rootScope.current_user = response.data.user.username;
+				$scope.error_message = response.message;
+        $location.path('/exam');
+      }
+      else{
+				console.log("Debug 2:Signup else..........");
+        $scope.error_message = data.message;
+      }
+    });
+};
+
+});
+
+</script>
+
+</body>
+</html>
